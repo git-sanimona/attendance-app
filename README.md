@@ -55,7 +55,7 @@ timestamp created_at
 timestamp updated_at
 }
 
-breaks {
+attendance_breaks {
 bigint id PK
 bigint_unsigned attendance_record_id FK
 timestamp break_in "休憩入り"
@@ -68,14 +68,12 @@ applications {
 bigint id PK
 bigint_unsigned user_id FK
 bigint_unsigned attendance_record_id FK "NULL許容"
-bigint_unsigned approved_by FK "承認者のuser_id (NULL許容)"
 tinyint_unsigned approval_status "0:承認待ち、1:承認済み"
 date new_date "対象日"
 timestamp new_clock_in
 timestamp new_clock_out
 text comment "申請理由"
 timestamp application_date "申請日時"
-timestamp approved_at "承認日時 (NULL許容)"
 timestamp created_at
 timestamp updated_at
 }
@@ -83,6 +81,7 @@ timestamp updated_at
 proposal_breaks {
 bigint id PK
 bigint_unsigned application_id FK
+bigint_unsigned attendance_break_id FK
 timestamp new_break_in
 timestamp new_break_out
 timestamp created_at

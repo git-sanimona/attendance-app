@@ -106,15 +106,21 @@ class User extends Authenticatable
             get: function () {
                 $todayRecord = $this->latestAttendanceRecord;
 
-                if (! $todayRecord || $todayRecord->clock_out !== null) {
+                if (! $todayRecord) {
                     return '勤務外';
                 }
 
-                $todayBreak = $todayRecord->breaks()
-                    ->whereNull('break_out')
-                    ->exists();
+                if (! $todayRecord || $todayRecord->clock_out !== null) {
+                    return '退勤済';
+                }
 
-                if ($todayBreak) {
+                // 休憩データ(コレクション)があれば休憩終了時刻がnullのデータが含まれているかチェック。
+                // 含まれていれば休憩中、なければfalse
+                $isBreaking = $todayRecord->breaks
+                    ? $todayRecord->breaks->contains(fn ($break) => $break->break_out === null)
+                    : false;
+
+                if ($isBreaking) {
                     return '休憩中';
                 }
 

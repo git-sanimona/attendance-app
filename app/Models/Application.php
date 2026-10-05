@@ -46,9 +46,21 @@ class Application extends Model
             get: fn ($value) => match ($value) {
                 self::STATUS_PENDING => '承認待ち',
                 self::STATUS_APPROVED => '承認済み',
-                default => null,
+                default => '不明',
             }
         );
+    }
+
+    // 承認待ちの判定メソッド。(getRawOriginal()でアクセサを通す前の生の値(0)を取得して比較)
+    public function isPending(): bool
+    {
+        return $this->getRawOriginal('approval_status') === self::STATUS_PENDING;
+    }
+
+    // 承認済み判定メソッド。(getRawOriginal()でアクセサを通す前の生の値(1)を取得して比較)
+    public function isApproved(): bool
+    {
+        return $this->getRawOriginal('approval_status') === self::STATUS_APPROVED;
     }
 
     // 一つの修正申請は1人のユーザーに紐づく

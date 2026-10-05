@@ -104,8 +104,8 @@ timestamp updated_at
 summary_reports {
 bigint id PK
 bigint_unsigned user_id FK
-date start_month
-date end_month
+date start_date
+date end_date
 int_unsigned total_work_minutes "総労働時間(分)"
 int_unsigned total_overtime_minutes "総残業時間(分)"
 int_unsigned avg_work_minutes "平均労働時間(分)"

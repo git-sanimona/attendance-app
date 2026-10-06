@@ -25,11 +25,11 @@ class MonthlyAttendance extends Model
         ];
     }
 
-    //対象月(１ヶ月に１レコード)に自動でその月の１日揃えて保存するミューテタ
+    // 対象月(１ヶ月に１レコード)に自動でその月の１日揃えて保存するミューテタ
     protected function targetMonth(): Attribute
     {
         return Attribute::make(
-            set: fn($value) => Carbon::parse($value)->startOfMonth()->format('Y-m-d')
+            set: fn ($value) => Carbon::parse($value)->startOfMonth()->format('Y-m-d')
         );
     }
 

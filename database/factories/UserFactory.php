@@ -29,18 +29,18 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'role' => User::ROLE_USER, //デフォルトの一般ユーザー(0)
+            'role' => User::ROLE_USER, // デフォルトの一般ユーザー(0)
             'scheduled_work_start' => '09:00:00',
             'scheduled_work_end' => '18:00:00',
             'remember_token' => Str::random(10),
         ];
     }
 
-    //管理者を生成するStateメソッド
+    // 管理者を生成するStateメソッド
     public function admin(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'role' => User::ROLE_ADMIN, //管理者権限(1)
+        return $this->state(fn (array $attributes) => [
+            'role' => User::ROLE_ADMIN, // 管理者権限(1)
         ]);
     }
 
@@ -49,7 +49,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
     }

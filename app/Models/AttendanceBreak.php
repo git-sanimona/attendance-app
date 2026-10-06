@@ -30,10 +30,4 @@ class AttendanceBreak extends Model
     {
         return $this->belongsTo(AttendanceRecord::class);
     }
-
-    // 1つの休憩は複数回の休憩の修正申請に対応する
-    public function proposalBreaks(): HasMany
-    {
-        return $this->hasMany(ProposalBreak::class);
-    }
 }

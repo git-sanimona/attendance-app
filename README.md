@@ -25,8 +25,8 @@ users ||--o{ applications : "1つのユーザーは複数の申請を出す"
 users ||--o{ monthly_attendances : "1つのユーザーは複数の月次集計を持つ"
 users ||--o{ summary_reports : "1つのユーザーは複数のサマリーを持つ"
 
-attendance_records ||--o{ breaks : "1日の勤怠は複数の休憩実績を持つ"
-attendance_records |o--o{ applications : "1日の勤怠に対して複数の修正申請が出される"
+attendance_records ||--o{ attendance_breaks : "1日の勤怠は複数の休憩実績を持つ"
+attendance_records ||--o{ applications : "1日の勤怠に対して修正申請が出される"
 
 applications ||--o{ proposal_breaks : "1つの申請は複数の変更用休憩を持つ"
 
@@ -81,7 +81,7 @@ timestamp updated_at
 proposal_breaks {
 bigint id PK
 bigint_unsigned application_id FK
-bigint_unsigned attendance_break_id FK
+bigint_unsigned attendance_break_id FK "NULL許容"
 timestamp new_break_in
 timestamp new_break_out
 timestamp created_at
@@ -91,7 +91,7 @@ timestamp updated_at
 monthly_attendances {
 bigint id PK
 bigint_unsigned user_id FK
-date month "対象の月"
+date target_month "対象月"
 int_unsigned work_minutes "一月の労働時間(分)"
 int_unsigned overtime "一月の残業時間(分)"
 int_unsigned late_count "遅刻回数"

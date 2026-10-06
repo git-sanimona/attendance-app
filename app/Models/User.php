@@ -2,19 +2,19 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail; //ユーザーが新規登録した際に、メールアドレスの所有確認（メール認証）を必須にする
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable; //メール通知のトレイトを使うなら必要
+use Laravel\Sanctum\HasApiTokens; //公開APIにするなら必要
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, HasApiTokens, Notifiable; //最終的なインポートに合わせて調整
 
     // モデル内に定数を定義する（Enumの代わり）
     public const ROLE_USER = 0;
@@ -53,8 +53,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'role' => 'integer', // tinyIntegerの場合もintegerで記述
-        // 'email_verified_at',今回はメール認証済みに管理者からの操作はないため不要
+        'role' => 'integer',
+        'email_verified_at',
+        今回はメール認証済みに管理者からの操作はないため不要
     ];
 
     // 1つのユーザーは複数の勤怠実績を持つ
@@ -75,16 +76,18 @@ class User extends Authenticatable
         return $this->hasMany(MonthlyAttendance::class);
     }
 
-    // 1つのユーザーは複数のサマリーを持つ
-    public function summaryReports(): HasMany
-    {
-        return $this->hasMany(SummaryReport::class);
-    }
+    /** 応用のため一時外す
+     *  1つのユーザーは複数のサマリーを持つ
+     *public function summaryReports(): HasMany
+     *{
+     *    return $this->hasMany(SummaryReport::class);
+     *}
+     */
 
     // 【追加リレーション】本日の勤怠実績（複数の勤怠レコードから1対1で日付カラムの最新(最大のデータ)１件を取得）
     public function latestAttendanceRecord(): HasOne
     {
-        return $this->hasOne(AttendanceRecord::class)->latestOfMany('date');
+        return $this->hasOne(AttendanceRecord::class)->latestOfMany('id');
     }
 
     // 【経由リレーション】ユーザーが持つ全ての休憩実績を取得（User -> AttendanceRecord -> AttendanceBreak）
@@ -106,18 +109,18 @@ class User extends Authenticatable
             get: function () {
                 $todayRecord = $this->latestAttendanceRecord;
 
-                if (! $todayRecord) {
+                if (!$todayRecord) {
                     return '勤務外';
                 }
 
-                if (! $todayRecord || $todayRecord->clock_out !== null) {
+                if (!$todayRecord || $todayRecord->clock_out !== null) {
                     return '退勤済';
                 }
 
                 // 休憩データ(コレクション)があれば休憩終了時刻がnullのデータが含まれているかチェック。
                 // 含まれていれば休憩中、なければfalse
                 $isBreaking = $todayRecord->breaks
-                    ? $todayRecord->breaks->contains(fn ($break) => $break->break_out === null)
+                    ? $todayRecord->breaks->contains(fn($break) => $break->break_out === null)
                     : false;
 
                 if ($isBreaking) {

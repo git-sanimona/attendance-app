@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,14 +15,22 @@ class MonthlyAttendance extends Model
 
     protected $fillable = [
         'user_id',
-        'month',
+        'target_month',
     ];
 
     protected function casts(): array
     {
         return [
-            'month' => 'date',
+            'target_month' => 'date',
         ];
+    }
+
+    //対象月(１ヶ月に１レコード)に自動でその月の１日揃えて保存するミューテタ
+    protected function targetMonth(): Attribute
+    {
+        return Attribute::make(
+            set: fn($value) => Carbon::parse($value)->startOfMonth()->format('Y-m-d')
+        );
     }
 
     // 一月の勤怠は1人のユーザーに紐づく
@@ -33,8 +42,8 @@ class MonthlyAttendance extends Model
     // 一月の勤怠は複数の日次勤怠を持つ
     public function attendanceRecords(): HasMany
     {
-        $firstDay = Carbon::parse($this->month)->startOfMonth();
-        $lastDay = Carbon::parse($this->month)->endOfMonth();
+        $firstDay = Carbon::parse($this->target_month)->startOfMonth();
+        $lastDay = Carbon::parse($this->target_month)->endOfMonth();
 
         return $this->hasMany(AttendanceRecord::class, 'user_id', 'user_id')
             ->whereBetween('date', [$firstDay, $lastDay]);
